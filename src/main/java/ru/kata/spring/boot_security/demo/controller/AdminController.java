@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -46,10 +47,14 @@ public class AdminController {
         return "/admin/index";
     }
 
-    @GetMapping("/users/new")
+    @GetMapping("/users/add")
     public String createUserForm(Model model) {
         User user = new User();
+        List<Role> roles = roleService.findAll().stream()
+                .filter(role -> !role.getName().equals("ROLE_ADMIN")) // Исключаем роль администратора
+                .toList();
         model.addAttribute("user", user);
+        model.addAttribute("listRoles", roles); // Передаем отфильтрованные роли
         return "/admin/add";
     }
 

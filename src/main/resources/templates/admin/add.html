@@ -17,38 +17,38 @@
                     <form role="form" class="form-horizontal" th:method="POST" th:action="@{/admin/users}" th:object="${user}">
                         <div class="form-group text-center">
                             <label for="name" class="control-label font-weight-bold">Name</label>
-                            <input type="text" class="form-control" placeholder="Name" aria-label="Name"
-                                   th:field="*{name}" id="name" required minlength="3" maxlength="30">
+                            <input type="text" class="form-control" placeholder="Name"
+                                   th:value="${name}" name="name" id="name" required minlength="3" maxlength="30"/>
                             <small class="text-danger" th:if="${#fields.hasErrors('name')}"
                                    th:errors="*{name}"></small>
                         </div>
 
                         <div class="form-group text-center">
                             <label for="lastName" class="control-label font-weight-bold">Last Name</label>
-                            <input type="text" class="form-control" placeholder="Last Name" aria-label="Last name"
-                                   th:field="*{lastName}" id="lastName" required minlength="3" maxlength="30">
+                            <input type="text" class="form-control" placeholder="Last Name"
+                                   th:value="${lastName}" name="lastName" id="lastName" required minlength="3" maxlength="30"/>
                             <small class="text-danger" th:if="${#fields.hasErrors('lastName')}"
                                    th:errors="*{lastName}"></small>
                         </div>
 
                         <div class="form-group text-center">
                             <label for="age" class="control-label font-weight-bold">Age</label>
-                            <input type="number" class="form-control" placeholder="Age" aria-label="Age" th:field="*{age}"
-                                   id="age" required min="1" max="120">
+                            <input type="number" class="form-control" placeholder="Age"
+                                   th:value="${age}" name="age" id="age" required min="1" max="120"/>
                             <small class="text-danger" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></small>
                         </div>
 
                         <div class="form-group text-center">
                             <label for="email" class="control-label font-weight-bold">Email</label>
-                            <input type="text" class="form-control" placeholder="Email" aria-label="Email"
-                                   th:field="*{email}" id="email" required>
+                            <input type="text" class="form-control" placeholder="Email"
+                                   th:value="${email}" name="email" id="email" required/>
                             <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
                         </div>
 
                         <div class="form-group text-center">
                             <label for="pass" class="control-label font-weight-bold">Password</label>
-                            <input type="text" class="form-control" placeholder="Password" aria-label="Password"
-                                   th:field="*{password}" id="pass" required>
+                            <input type="text" class="form-control" placeholder="Password"
+                                   th:value="${password}" name="password" id="pass"  required>
                             <small class="text-danger" th:if="${#fields.hasErrors('password')}"
                                    th:errors="*{password}"></small>
                         </div>
@@ -56,7 +56,7 @@
                         <div class="form-group text-center">
                             <label for="role" class="control-label font-weight-bold">Roles</label>
                             <select class="form-control form-control-static" multiple="multiple"
-                                    size="2" th:field="*{roles}" id="role">
+                                    size="2" th:value="${roles}" name="roles" id="role">
                                 <option value="1" th:selected="${true}">User</option>
                                 <option value="2">Admin</option>
                             </select>
