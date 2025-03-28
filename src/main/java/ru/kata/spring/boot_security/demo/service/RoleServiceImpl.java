@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
@@ -20,26 +21,19 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository = roleRepository;
     }
 
-    @Transactional
-    @Override
-    public Role save(Role role) {
-        return roleRepository.save(role);
-    }
-
     @Override
     public Set<Role> findAll() {
         return new HashSet<>(roleRepository.findAll());
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        return roleRepository.findById(id);
+    public Role save(Role role) {
+        return roleRepository.save(role);
     }
 
-    @Transactional
     @Override
-    public void deleteById(Long id) {
-        roleRepository.deleteById(id);
+    public Optional<Role> findById(Long id) {
+        return roleRepository.findById(id);
     }
 
     @Override
@@ -50,5 +44,10 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Set<Role> findAllById(Set<Long> roleIds) {
         return new HashSet<>(roleRepository.findAllById(roleIds));
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        roleRepository.deleteById(id);
     }
 }

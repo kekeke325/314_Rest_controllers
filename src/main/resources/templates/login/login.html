@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 40vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 380px;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .wider-button {
+            width: 100%;
+        }
+
+        .error-message {
+            margin-top: 1rem;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+
+<body>
+<div class="login-container">
+    <form th:action="@{/process_login}" method="POST">
+        <h2 class="text-center mb-4">Please sign in</h2>
+
+        <div class="mb-3">
+            <label for="email" class="form-label visually-hidden">Email address</label>
+            <input type="email" class="form-control" id="email"
+                   placeholder="Email address"
+                   name="email"
+                   autocomplete="username"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label visually-hidden">Password</label>
+            <input type="password" class="form-control" id="password"
+                   placeholder="Password"
+                   name="password"
+                   autocomplete="current-password"
+                   required>
+        </div>
+
+        <button type="submit" class="btn btn-primary wider-button mb-3">Sign in</button>
+
+        <div th:if="${param.error}" class="alert alert-danger error-message">
+            Invalid Email or Password
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</body>
+</html>

@@ -43,14 +43,15 @@ public class User implements UserDetails {
     @Size(min = 3, max = 30)
     private String name;
 
-    @Column(name = "last_Name", nullable = false)
+    @Column(name = "last_name", nullable = false)
     @NotBlank
+    @Size(min = 3, max = 30)
     private String lastName;
 
     @Column(name = "age", nullable = false)
     @Min(value = 1)
     @Max(value = 120)
-    private Long age;
+    private Integer age;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -58,20 +59,21 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
 
     public User() {
-
     }
 
-    public User(String email, String name, String lastName, Long age) {
+    public User(String email, String name, String lastName, Integer age, String password, Set<Role> roles) {
         this.email = email;
         this.name = name;
         this.lastName = lastName;
         this.age = age;
+        this.password = password;
+        this.roles = roles;
     }
 
     @Override
@@ -135,10 +137,6 @@ public class User implements UserDetails {
         this.name = name;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getLastName() {
         return lastName;
     }
@@ -147,12 +145,16 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public Long getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(Long age) {
+    public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Set<Role> getRoles() {

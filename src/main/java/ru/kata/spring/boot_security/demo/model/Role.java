@@ -12,7 +12,7 @@ import javax.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Role implements GrantedAuthority {
 
     @Id
@@ -23,7 +23,6 @@ public class Role implements GrantedAuthority {
     private String name;
 
     public Role() {
-
     }
 
     public Role(Long id, String name) {
@@ -48,13 +47,13 @@ public class Role implements GrantedAuthority {
     }
 
     @Override
-    public String toString() {
+    public String getAuthority() {
         return name;
     }
 
     @Override
-    public String getAuthority() {
-        return name;
+    public String toString() {
+        return this.name;
     }
 
     @Override
@@ -70,8 +69,6 @@ public class Role implements GrantedAuthority {
 
     @Override
     public final int hashCode() {
-        return this instanceof HibernateProxy hibernateProxy
-                ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode()
-                : getClass().hashCode();
+        return this instanceof HibernateProxy hibernateProxy ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }
