@@ -182,5 +182,4 @@ public class User implements UserDetails {
                 ? hibernateProxy.getHibernateLazyInitializer().getPersistentClass().hashCode()
                 : getClass().hashCode();
     }
-
 }

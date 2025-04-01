@@ -1,3 +1,5 @@
+
+
 package ru.kata.spring.boot_security.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+        users.forEach(user -> user.getRoles().size());
+        return users;
     }
 
     @Override

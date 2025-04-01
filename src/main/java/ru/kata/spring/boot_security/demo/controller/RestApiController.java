@@ -2,9 +2,9 @@ package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,76 +12,116 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.WebContext;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
-import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
 public class RestApiController {
 
     private final UserService userService;
+    private final TemplateEngine templateEngine;
+    private final RoleService roleService;
 
     @Autowired
-    public RestApiController(UserService userService) {
+    public RestApiController(UserService userService, TemplateEngine templateEngine, RoleService roleService) {
         this.userService = userService;
+        this.templateEngine = templateEngine;
+        this.roleService = roleService;
     }
 
-    @GetMapping("/users")
-    @Transactional
-    public List<User> getAllUsers() {
-        List<User> users = userService.findAll();
-        users.forEach(user -> user.getRoles().size());
-        return users;
+    @GetMapping(value = "/auth/login", produces = MediaType.TEXT_HTML_VALUE)
+    public String loginPage(HttpServletRequest request, HttpServletResponse response) {
+        WebContext context = new WebContext(request, response, request.getServletContext());
+        return templateEngine.process("login/login", context);
     }
 
-    @PostMapping("/users")
-    public ResponseEntity<HttpStatus> createUser(@RequestBody @Valid User user,
-                                                 BindingResult bindingResult) {
-        Optional<User> userByEmail = userService.findByEmail(user.getEmail());
-        if (userByEmail.isPresent()) {
-            bindingResult.rejectValue("email", "error.email",
-                    "This email is already in use");
+    @GetMapping(value = "/user", produces = MediaType.TEXT_HTML_VALUE)
+    public String userProfile(Authentication authentication,
+                              HttpServletRequest request,
+                              HttpServletResponse response) {
+        WebContext context = new WebContext(request, response, request.getServletContext());
+
+        User user = userService.findByEmail(authentication.getName()).orElse(new User());
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .map(role -> role.split("_")[1])
+                .toList();
+
+        context.setVariable("user", user);
+        context.setVariable("roles", roles);
+
+        return templateEngine.process("user/user_index", context);
+    }
+
+    @GetMapping(value = "admin/users", produces = MediaType.TEXT_HTML_VALUE)
+    public String adminProfile(Authentication authentication,
+                               HttpServletRequest request,
+                               HttpServletResponse response) {
+        WebContext context = new WebContext(request, response, request.getServletContext());
+
+        User user = userService.findByEmail(authentication.getName()).orElse(new User());
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .map(role -> role.split("_")[1])
+                .toList();
+
+        context.setVariable("user", user);
+        context.setVariable("roles", roles);
+        context.setVariable("listRoles", roleService.findAll());
+
+        return templateEngine.process("admin/index", context);
+    }
+
+    @GetMapping(value = "/api/users")
+    public ResponseEntity<List<User>> findAll() {
+        return ResponseEntity.ok(userService.findAll());
+    }
+
+    @PostMapping("/api/users")
+    public ResponseEntity<?> createUser(@RequestBody @Valid User user,
+                                        BindingResult bindingResult) {
+        if (userService.findByEmail(user.getEmail()).isPresent()) {
+            bindingResult.rejectValue("email", "error.email", "This email is already in use");
         }
+
         if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+            List<String> errors = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .toList();
-            throw new EntityNotFoundException();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         userService.add(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/users")
-    public ResponseEntity<HttpStatus> editUser(@RequestBody @Valid User user,
-                                               BindingResult bindingResult) {
+    @PatchMapping("/api/users")
+    public ResponseEntity<?> updateUser(@RequestBody @Valid User user,
+                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            List<String> errorMessages = bindingResult.getFieldErrors().stream()
+            List<String> errors = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .toList();
-            throw new EntityNotFoundException();
+            return ResponseEntity.badRequest().body(errors);
         }
 
         userService.update(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Long id) {
-        if (userService.findById(id).isPresent()) {
-            userService.deleteById(id);
-        }
-
-        return new ResponseEntity<>(HttpStatus.OK);
-
+    @DeleteMapping("/api/users/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.findById(id).ifPresent(u -> userService.deleteById(id));
+        return ResponseEntity.ok().build();
     }
-
 }
